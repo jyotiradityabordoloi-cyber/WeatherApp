@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Weather — check the sky, plan your day</title>
+  <meta name="description" content="Current weather, a plain-language mood for the day, and the live API response for any city.">
+  <meta name="theme-color" content="#07080a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#weather">Skip to weather</a>
+
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Weather home">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="15" cy="15" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/>
+        <path d="M15 3.5v2.6M15 23.9v-1.4M3.5 15h2.6M26.5 15h-2.6M6.9 6.9l1.8 1.8M23.1 6.9l-1.8 1.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M14 34h15.5a6.5 6.5 0 0 0 .6-13A8.5 8.5 0 0 0 14 23.6 5.2 5.2 0 0 0 14 34Z" fill="var(--bg)" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand-text">
+        <span class="brand-name">weather</span>
+        <span class="brand-tag">Same sky. A brighter day.</span>
+      </span>
+    </a>
+    <p class="topbar-note">Real-time weather<br>for a better you.</p>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <svg class="hero-art" viewBox="0 0 520 360" aria-hidden="true" focusable="false">
+        <defs>
+          <radialGradient id="sky-glow" cx="62%" cy="58%" r="60%">
+            <stop offset="0" stop-color="#f0a85a" stop-opacity=".42"/>
+            <stop offset=".45" stop-color="#7a4a2a" stop-opacity=".16"/>
+            <stop offset="1" stop-color="#07080a" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#e2a766"/>
+            <stop offset=".55" stop-color="#9a5f33"/>
+            <stop offset="1" stop-color="#2a1a10"/>
+          </linearGradient>
+          <linearGradient id="fade-left" x1="0" x2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+            <stop offset=".35" stop-color="#fff" stop-opacity="1"/>
+          </linearGradient>
+          <linearGradient id="ground" x1="0" x2="1"><stop offset="0" stop-color="#f0a85a" stop-opacity="0"/><stop offset=".55" stop-color="#f0a85a" stop-opacity=".35"/><stop offset="1" stop-color="#f0a85a" stop-opacity="0"/></linearGradient>
+          <mask id="hero-mask"><rect width="520" height="360" fill="url(#fade-left)"/></mask>
+        </defs>
+        <g mask="url(#hero-mask)">
+          <rect width="520" height="360" fill="url(#sky-glow)"/>
+          <g fill="url(#stone)">
+            <path fill-rule="evenodd" d="M246 120h148v240H246Z M292 360V214a28 28 0 0 1 56 0v146Z"/>
+            <path d="M238 104h164v18H238Z"/>
+            <path d="M254 86h132v18H254Z"/>
+            <path d="M296 72h48v14h-48Z"/>
+            <path d="M302 72a18 12 0 0 1 36 0Z"/>
+          </g>
+          <path d="M160 360h360v-5H160Z" fill="url(#ground)"/>
+        </g>
+      </svg>
+
+      <div class="hero-copy">
+        <h1 id="hero-title">Check the weather.<span>Plan a better day.</span></h1>
+
+        <form class="search" id="search-form" role="search" novalidate>
+          <label class="visually-hidden" for="city-input">City</label>
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="city-input" name="city" type="text" inputmode="search" autocomplete="off" spellcheck="false"
+                 maxlength="80" placeholder="Enter a city (e.g. New Delhi)" aria-describedby="search-hint">
+          <button class="search-submit" type="submit" aria-label="Search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </form>
+        <p class="search-hint" id="search-hint" aria-live="polite"></p>
+
+        <div class="chips" id="city-chips" role="group" aria-label="Popular cities"></div>
+      </div>
+    </section>
+
+    <p class="visually-hidden" id="status" role="status" aria-live="polite"></p>
+
+    <section class="now" id="weather" tabindex="-1" aria-labelledby="city-name" aria-busy="true" data-state="loading">
+      <div class="now-place">
+        <h2 class="city" id="city-name"><span class="skeleton">Loading</span></h2>
+        <p class="place-line">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.2" fill="currentColor"/></svg>
+          <span id="region-country"><span class="skeleton">Region, Country</span></span>
+        </p>
+        <p class="local-time"><span id="local-date"></span><span id="local-clock"></span></p>
+      </div>
+
+      <div class="now-temp">
+        <img class="cond-icon" id="cond-icon" alt="" width="96" height="96" hidden>
+        <div>
+          <p class="temp"><span id="temp-value">--</span><span class="temp-unit">°C</span></p>
+          <p class="cond-text" id="cond-text"></p>
+          <p class="updated" id="updated"></p>
+        </div>
+      </div>
+
+      <div class="now-mood" id="mood">
+        <p class="mood-heading">Today’s mood</p>
+        <p class="mood-label"><span class="mood-icon" id="mood-icon" aria-hidden="true"></span><span id="mood-label"></span></p>
+        <p class="mood-desc" id="mood-desc"></p>
+      </div>
+
+      <div class="now-error" id="error-panel" hidden>
+        <h2 class="error-title" id="error-title"></h2>
+        <p class="error-message" id="error-message"></p>
+        <button class="btn" type="button" id="retry-btn">Try again</button>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="Current conditions" id="metrics">
+      <article class="metric" data-metric="feels"><h3>Feels like</h3><p class="metric-value" data-value></p><p class="metric-note" data-note></p></article>
+      <article class="metric" data-metric="humidity"><h3>Humidity</h3><p class="metric-value" data-value></p><p class="metric-note" data-note></p></article>
+      <article class="metric" data-metric="wind"><h3>Wind speed</h3><p class="metric-value" data-value></p><p class="metric-note" data-note></p></article>
+      <article class="metric" data-metric="visibility"><h3>Visibility</h3><p class="metric-value" data-value></p><p class="metric-note" data-note></p></article>
+      <article class="metric" data-metric="uv"><h3>UV index</h3><p class="metric-value" data-value></p><p class="metric-note" data-note></p></article>
+      <article class="metric" data-metric="cloud"><h3>Cloud cover</h3><p class="metric-value" data-value></p><p class="metric-note" data-note></p></article>
+    </section>
+
+    <section class="inspector" aria-labelledby="inspector-title">
+      <div class="inspector-head">
+        <div>
+          <h2 id="inspector-title">API response</h2>
+          <p class="inspector-sub" id="inspector-sub">The response from WeatherAPI appears here after a search.</p>
+        </div>
+        <div class="inspector-actions">
+          <div class="tabs" role="tablist" aria-label="Response view">
+            <button type="button" role="tab" id="tab-raw" aria-controls="panel-raw" aria-selected="false" tabindex="-1">Raw JSON</button>
+            <button type="button" role="tab" id="tab-formatted" aria-controls="panel-formatted" aria-selected="true">Formatted JSON</button>
+          </div>
+          <button type="button" class="btn btn-quiet" id="copy-btn" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+            <span id="copy-label">Copy JSON</span>
+          </button>
+        </div>
+      </div>
+      <p class="response-meta" id="response-meta"></p>
+      <div class="code-wrap">
+        <div role="tabpanel" id="panel-raw" aria-labelledby="tab-raw" tabindex="0" hidden>
+          <pre class="code code-raw" id="raw-json"></pre>
+        </div>
+        <div role="tabpanel" id="panel-formatted" aria-labelledby="tab-formatted" tabindex="0">
+          <pre class="code code-formatted" id="formatted-json"></pre>
+        </div>
+        <p class="code-empty" id="code-empty">Search for a city to see its API response.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Weather data from <a href="https://www.weatherapi.com/" rel="noopener" target="_blank">WeatherAPI.com</a>. Moods are a rule-of-thumb reading, not a forecast.</p>
+  </footer>
+</body>
+</html>
